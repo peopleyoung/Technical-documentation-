@@ -1,0 +1,92 @@
+############################################################
+#################docker API##################################
+############################################################
+1. 拉去镜像
+docker pull 镜像
+
+2.创建容器
+docker run -it --name 容器名 --gpus all --network=host --shm-size="16g" -v /data/gao:/build(本地:容器内) ds6.0.1:torch1.10.2(镜像名:版本) /bin/bash
+
+3.启动、关闭
+docker start/stop 容器名
+
+3.进入容器
+docker exec -it 容器名 /bin/bash
+
+4.删除镜像/容器
+docker rmi 镜像名
+docker rm 容器名
+
+5.docker 的容器自动在开机启动
+docker run 指令中加入 --restart=always 就行。
+Bash代码 
+sudo docker run --restart=always .....
+如果创建时未指定 --restart=always ,可通过update 命令设置
+Bash代码 
+docker update --restart=always 容器名
+
+/opt/nvidia/deepstream/deepstream-6.0/sources/gst-plugins/gst-nvinfer     gstnvinfer_meta_utils.cpp
+/opt/nvidia/deepstream/deepstream-6.1/user_additional_install.sh
+
+
+##########################################################
+####################git API ################################
+#########################################################
+1. 克隆仓库
+git clone 地址
+git clone -b 分支名 仓库地址 ##拉取远程某个分支的代码
+git status  查看当前状态
+2. git删除远程分支
+git push origin --delete [branch_name]
+2. 删除本地分支区别
+git branch -d 会在删除前检查merge状态（其与上游分支或者与head）。
+git branch -D 是git branch --delete --force的简写，它会直接删除。
+共同点
+都是删除本地分支的方法（与删除远程分支命令相独立，要想本地和远程都删除，必须得运行两个命令）。
+3. git查看分支：
+查看本地分支 git branch
+查看远程分支 git branch -r
+查看本地和远程分支 git branch -a
+4.git删除分支：
+删除本地分支 git branch -d 本地分支名
+删除远程分支 git push origin --delete 远程分支名
+推送空分支到远程（删除远程分支另一种实现）git push origin :远程分支
+###################################################################################
+1. 设置个人信息
+git config --global user.name 'yangshuai'
+git config --global user.email 1358224153@qq.com
+2.把需要上传的文件夹变成git可管理的文件
+git init
+3.将本地文件添加到暂存区；
+git add .
+4.添加你要上传到的远程仓库；
+git remote add origin 仓库地址
+5. 创建并切换到新分支
+git checkout -b [name]    //name 为自己取得分支名
+6.提交更新
+git commit -m "test"  //test表示提交的名称
+7.将提交上传到远程仓库
+ git push -u origin [name]   //name为要上传到远端的分支名
+或者
+git push --set-upstream origin  [name]
+
+####################################################################################
+####################################
+Triton Server
+##################################
+启动triton-server的docker:
+docker run --rm  --gpus=1 -p8000:8000 -p8001:8001 -p8002:8002 -v /home/zzmj/YangS/model_repository:/models nvcr.io/nvidia/tritonserver:22.06-py3 tritonserver --model-repository=/models
+docker run --rm --gpus=all  -p8000:8000 -p8001:8001 -p8002:8002 -v /home/zzmngS/model_repository:/models nvcr.io/nvidia/tritonserver:21.08-py3 tritonserver --model-repository=/models
+docker run --rm  --gpus=all --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 -p8000:8000 -p8001:8001 -p8002:8002 -v /home/zzmj/YangS/model_repository:/models nvcr.io/nvidia/tritonserver:21.08-py3 tritonserver --model-repository=/models --grpc-infer-allocation-pool-size=16 --log-verbose 1
+docker run --rm  --gpus=all --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 -p8000:8000 -p8001:8001 -p8002:8002 -v /home/zzmj/YangS/model_repository:/models nvcr.io/nvidia/tritonserver:21.08-py3 tritonserver --model-repository=/models  --log-verbose 1
+docker run --rm  --gpus=all -p8000:8000 -p8001:8001 -p8002:8002 -v /home/zzmj/YangS/model_repository:/models nvcr.io/nvidia/tritonserver:21.08-py3 tritonserver --model-repository=/models  --log-verbose 1
+在docker内部运行服务：
+CUDA_VISIBLE_DEVICES=0 tritonserver --model-repository=./model_repository
+
+####################################
+ffmpeg
+####################################
+1. 拉流
+ffplay -i "http://172.16.66.41:10800/flv/live/stream_34.flv" -fflags nobuffer 
+2. 推流（循环）
+ffmpeg -re -stream_loop -1 -i D:\Desktop\1.mp4 -c copy -f rtsp rtsp://127.0.0.1:8554/stream

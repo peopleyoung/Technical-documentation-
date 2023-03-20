@@ -1,0 +1,67 @@
+YOOLV4 模型转换：
+
+1.首先将训练好的模型放到172.16.66.249服务器 home/pythorch_YOLOv4文件夹下
+
+2. home/pythorch_YOLOv4文件夹空白处点击右键打开终端
+
+3.在终端输入：python demo_darknet2onnx.py yolov4_mine_test.cfg yolov4_mine_best.weights dog.jpg 0
+ 等待运行完毕
+
+4.继续在终端输入：/home/zzmj/TensorRT-7.0.0.11/bin/trtexec --onnx=yolov4_-1_3_512_512_dynamic.onnx \
+--minShapes=input:1x3x512x512 --optShapes=input:8x3x512x512 --maxShapes=input:8x3x512x512 \
+--workspace=4096 --saveEngine=yolov4.engine --fp16
+等待运行完毕，在home/pythorch_YOLOv4文件夹下会出现yolov4_ZMJ.engine文件
+
+
+
+
+###############################################################################
+deepstream模型部署：
+##############################################################################
+1. YOLOX模型转换：
+python3 trt.py -f ./exps/default/yolox_s.py -c yolox_s.pth -b 2 （-c pth模型路径，-b 批次/摄像头路数）
+
+2.copy YOLO_outputs/YOLOX_outputs/yolox_s文件夹下的engine模型至Configs文件夹下
+
+3. 对Configs文件夹下的config_infer_primary.txt文件进行相应修改
+model-engine-file=model_trt_coco_2.engine （模型文件名）
+labelfile-path=labels.txt   （检测物体的类别名）
+num-detected-classes=80 （检测物体的类别数）
+batch-size=6  （批次/摄像头路数，与模型转换时设置的一致）
+对configs文件夹下的config.yaml文件进行修改：
+port: 11279 (端口，防冲突）
+camera_num: 6 （摄像头路数）
+
+4. 对nvdsinfer_custom_impl_yolox文件夹下的nvdsparsebbox_yolox.cpp文件进行相应修改：
+static const int NUM_CLASSES = 80; （检测物体的类别数）
+static const int INPUT_W = 640;
+static const int INPUT_H = 640;
+static const int IMAGE_W = 1920;
+static const int IMAGE_H = 1080;
+
+5. 在终端cd到nvdsinfer_custom_impl_yolox文件下，输入make 进行编译生成新的nvdsparsebbox_yolox.o文件
+
+
+#######################################################################
+数据库信息                                                            #################################
+#######################################################################
+ "mysql_ip":"172.16.66.41",
+  "mysql_port":33061,
+  "mysql_user": "root",
+  "mysql_pwd": "zzmj@zmj123456",
+  "mysql_db": "iron_data",
+  "mysql_table": "iron_data",
+  "mysql_charset":"utf8mb4"
+
+
+#####################################################################
+起摄像头路由
+####################################################################
+sudo ifconfig enp4s0f0 10.110.50.244 netmask 255.255.255.0
+sudo route add -net 10.110.14.0/24 gw 10.110.50.1
+sudo route add -net 10.110.60.0/24 gw 10.110.50.1
+sudo route add -net 10.110.12.0/24 gw 10.110.50.1
+sudo route add -net 10.110.1.0/24 gw 10.110.50.1
+
+
+

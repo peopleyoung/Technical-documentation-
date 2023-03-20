@@ -1,0 +1,27 @@
+python demo_darknet2onnx.py yolov4.cfg yolov4.weights dog.jpg 0
+
+/home/zzmj/TensorRT-7.0.0.11/bin/trtexec --onnx=yolov4_-1_3_512_512_dynamic.onnx \
+--minShapes=input:1x3x512x512 --optShapes=input:8x3x512x512 --maxShapes=input:8x3x512x512 \
+--workspace=4096 --saveEngine=yolov4.engine --fp16
+
+//------------------------------------------------------------------------------//
+
+
+python demo_darknet2onnx.py yolov4_zhaogu.cfg yolov4_zhaogu.weights test1.jpg 0
+
+/usr/src/tensorrt/bin/trtexec --onnx=yolov4_-1_3_608_608_dynamic.onnx \
+--minShapes=input:1x3x608x608 --optShapes=input:8x3x608x608 --maxShapes=input:8x3x608x608 \
+--workspace=4096 --saveEngine=yolov4_ZMJ.engine --fp16
+
+
+
+
+
+//------------------------------------------------------------------------------//
+
+
+python demo_darknet2onnx.py yolov4_mine.cfg yolov4_mine_best.weights test1.jpg 0
+
+/usr/src/tensorrt/bin/trtexec --onnx=yolov4_-1_3_608_608_dynamic.onnx \
+--minShapes=input:1x3x608x608 --optShapes=input:8x3x608x608 --maxShapes=input:8x3x608x608 \
+--workspace=4096 --saveEngine=yolov4_ZMJ.engine --fp16
